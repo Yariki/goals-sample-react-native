@@ -9,13 +9,28 @@ import { StyleSheet,
       FlatList} from 'react-native';
 import GoalItem from './components/GoalItem';
 import GoalInput from './components/GoalInput';
+import { Goal } from './types/types';
+import uuid from 'react-native-uuid';
 
 export default function App() {
 
-  const [courseGoals, setCourseGoals] = useState<string[]>([]);
+  const [courseGoals, setCourseGoals] = useState<Goal[]>([]);
 
   function addGoalHandler(enteredGoal: string) {
-    setCourseGoals(currentGoals => [...currentGoals, enteredGoal]);
+    setCourseGoals(currentGoals => 
+      [
+        ...currentGoals, 
+        {
+          value: enteredGoal, 
+          id : uuid.v4().toString()
+        }
+      ]);
+  }
+
+  function removeGoalHandler(goalId: string) {
+    setCourseGoals(currentGoals => {
+      return currentGoals.filter(goal => goal.id !== goalId);
+    });
   }
 
   return (
@@ -27,7 +42,11 @@ export default function App() {
           renderItem={({item, index}) => (
               courseGoals.length === 0 
               ? <Text>No Goals Yet!</Text> 
-              : <GoalItem text={item} index={index}/>
+              : <GoalItem 
+                text={item.value} 
+                id={item.id} 
+                onDelete={removeGoalHandler}
+                />
           )}
         >
         </FlatList>
